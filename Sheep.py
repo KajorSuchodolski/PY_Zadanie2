@@ -5,10 +5,7 @@ class Sheep:
         self.id_sheep = id_sheep
         self.is_dead = False
 
-    # up - 0
-    # right - 1
-    # down - 2
-    # left - 3
+    # up - 0, right - 1, down - 2, left - 3
 
     def move_sheep(self, direction, sheep_move_dist):
         if direction == 0:

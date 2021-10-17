@@ -1,7 +1,7 @@
 import math
 
 
-# KOD DO POPRAWY BTW
+# KOD DO POPRAWY BTW :3
 
 class Wolf:
     def __init__(self, x, y, wolf_move_dist, sheep):
