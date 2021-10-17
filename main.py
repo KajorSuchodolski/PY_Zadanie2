@@ -25,8 +25,10 @@ def random_position():
 
 
 def simulation():
-    sheep = [Sheep(random_position(), random_position(), i) for i in range(15)]
+    sheep = [Sheep(random_position(), random_position(), i + 1) for i in range(15)]
     wolf = Wolf(0.0, 0.0, 1.0, sheep)
+
+    pos_data = []
 
     for simulation_round in range(1, rounds + 1):
         for s in sheep:
@@ -34,9 +36,15 @@ def simulation():
 
         wolf.move_wolf()
 
+        alive = []
+
+        for i in sheep:
+            if i.is_dead is False:
+                alive.append(i)
+
         print('\nRound number: ', simulation_round)
         print('Wolf position: ', wolf.x, ', ', wolf.y)
-        print('Number of sheep alive: ', len(sheep))
+        print('Number of sheep alive: ', len(alive))
         if wolf.is_chasing is not True:
             print('Wolf has eaten sheep number: ', wolf.sheep_number)
         else:
@@ -47,26 +55,34 @@ def simulation():
         sheep_pos = []
 
         for j in range(0, len(sheep)):
-            if sheep[j].is_dead is False:
+            if sheep[j].is_dead is not True:
                 sheep_pos.append([sheep[j].x, sheep[j].y])
             else:
                 sheep_pos.append('null')
 
-        pos_data = {
+        pos_data.append({
             'round_no': simulation_round,
             'wolf_pos': [wolf.x, wolf.y],
             'sheep_pos': sheep_pos
-        }
+        })
 
-        with open('pos.json', 'a') as f_json:
-            json.dump(pos_data, f_json, indent=2)
 
-        row_alive = [simulation_round, len(sheep)]
+        # with open('pos.json', 'a') as f_json:
+        #     json.dump(pos_data, f_json, indent=2)
+
+        row_alive = [simulation_round, len(alive)]
         with open('alive.csv', 'a', newline='') as f_csv:
             writer = csv.writer(f_csv)
             if simulation_round == 1:
                 writer.writerow(['round', 'alive'])
             writer.writerow(row_alive)
+
+    save_to_json(pos_data)
+
+def save_to_json(data):
+    with open('pos.json', 'w') as f_json:
+        json.dump(data, f_json, indent=2)
+
 
 
 simulation()

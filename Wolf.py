@@ -15,12 +15,13 @@ class Wolf:
 
     def move_wolf(self):
 
-        if self.victim is not True:
+        if self.is_chasing is False:
             self.is_chasing = True
             sheep_distances = []
 
             for pp in self.sheep:
-                sheep_distances.append(self.check_distance(pp.x, pp.y))
+                if pp.is_dead is False:
+                    sheep_distances.append(self.check_distance(pp.x, pp.y))
 
             sheep_number = self.sheep[sheep_distances.index(min(sheep_distances))].id_sheep
             self.sheep_number = sheep_number
@@ -36,13 +37,13 @@ class Wolf:
             self.x = self.victim.x
             self.y = self.victim.y
             self.victim.is_dead = True
-            self.sheep.remove(self.victim)
+            # self.sheep.remove(self.victim)
             self.is_chasing = False
 
         # TODO
         else:
-            move_to_x = self.wolf_move_dist * ((self.victim.x - self.x) / self.check_distance(self.victim.x, self.victim.y))
-            move_to_y = self.wolf_move_dist * ((self.victim.y - self.y) / self.check_distance(self.victim.x, self.victim.y))
+            move_to_x = self.wolf_move_dist * (self.victim.x - self.x) / self.check_distance(self.victim.x, self.victim.y)
+            move_to_y = self.wolf_move_dist * (self.victim.y - self.y) / self.check_distance(self.victim.x, self.victim.y)
             self.x += move_to_x
             self.y += move_to_y
 
