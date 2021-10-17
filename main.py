@@ -20,6 +20,7 @@ sheep_move_dist = 0.5
 wolf_move_dist = 1.0
 num_of_sheep = 15
 wait_for_key = False
+directory = "data"
 
 parser = argparse.ArgumentParser()
 
@@ -52,9 +53,10 @@ if args.config:
     wolf_move_dist = float(config_file.get('Movement', 'WolfMoveDist'))
     sheep_move_dist = float(config_file.get('Movement', 'SheepMoveDist'))
 
-# if args.dir:
-#     if not os.path.isdir(dir):
-#         os.mkdir(dir)
+if args.dir:
+    if not os.path.isdir(args.dir):
+        os.mkdir(args.dir)
+    directory = args.dir
 
 if args.rounds:
     if args.rounds <= 0:
@@ -73,7 +75,7 @@ if args.wait:
 
 
 def save_to_json(data):
-    with open('pos.json', 'w') as f_json:
+    with open(directory + "\\" + 'pos.json', 'w') as f_json:
         json.dump(data, f_json, indent=2)
 
 
@@ -86,6 +88,10 @@ def random_position():
 
 
 def simulation():
+
+    if not os.path.isdir(directory):
+        os.mkdir(directory)
+
     sheep = [Sheep(random_position(), random_position(), i + 1) for i in range(num_of_sheep)]
     wolf = Wolf(0.0, 0.0, wolf_move_dist, sheep)
 
@@ -131,7 +137,7 @@ def simulation():
         #     json.dump(pos_data, f_json, indent=2)
 
         row_alive = [simulation_round, len(alive)]
-        with open('alive.csv', 'a', newline='') as f_csv:
+        with open(directory + "\\" + 'alive.csv', 'a', newline='') as f_csv:
             writer = csv.writer(f_csv)
             if simulation_round == 1:
                 writer.writerow(['round', 'alive'])
@@ -144,3 +150,5 @@ def simulation():
 
 
 simulation()
+
+
