@@ -21,7 +21,8 @@ sheep_move_dist = 0.5
 wolf_move_dist = 1.0
 num_of_sheep = 15
 wait_for_key = False
-directory = "data"
+directory = None
+path = ""
 
 parser = argparse.ArgumentParser()
 
@@ -84,8 +85,8 @@ if args.log:
                         format='%(asctime)s:%(name)s:%(message)s')
 
 
-def save_to_json(data):
-    with open(directory + "\\" + 'pos.json', 'w') as f_json:
+def save_to_json(data, path):
+    with open(path + 'pos.json', 'w') as f_json:
         json.dump(data, f_json, indent=2)
 
 
@@ -98,11 +99,19 @@ def random_position():
 
 
 def simulation():
+    global path
+    if directory is not None:
+        path = directory + "\\"
+        if not os.path.isdir(directory):
+            os.mkdir(directory)
 
-    if not os.path.isdir(directory):
-        os.mkdir(directory)
+    rand_x = random_position()
+    rand_y = random_position()
 
-    sheep = [Sheep(random_position(), random_position(), i + 1) for i in range(num_of_sheep)]
+    sheep = [Sheep(rand_x, rand_y, i + 1) for i in range(num_of_sheep)]
+    logging.debug("Function Sheep(", rand_x, rand_y, "i + 1 was called in a loop: for i in range(", num_of_sheep,
+                  " returning a Sheep object with every loop transition and adding it to a list: ", sheep)
+
     wolf = Wolf(0.0, 0.0, wolf_move_dist, sheep)
     logging.debug("Function Wolf(", 0.0, 0.0, wolf_move_dist, sheep, ") was called, returning a Wolf object:", wolf)
 
@@ -125,14 +134,12 @@ def simulation():
                 logging.debug("Function alive.append(", i, ") was called")
 
         print('\nRound number: ', simulation_round)
-        print('Wolf position: ', wolf.x, ', ', wolf.y)
+        print('Wolf position: ', format(wolf.x, '.3f'), ', ', format(wolf.y, '.3f'))
         print('Number of sheep alive: ', len(alive))
         if wolf.is_chasing is not True:
             print('Wolf has eaten sheep number: ', wolf.sheep_number)
         else:
-            print('Wolf is uwu chasing :3 sheep number: ', wolf.sheep_number)
-        umu_sheep = wolf.victim
-        print('Sheep umu: ', umu_sheep.x, umu_sheep.y)
+            print('Wolf is chasing sheep number: ', wolf.sheep_number)
 
         sheep_pos = []
 
@@ -154,7 +161,7 @@ def simulation():
         #     json.dump(pos_data, f_json, indent=2)
 
         row_alive = [simulation_round, len(alive)]
-        with open(directory + "\\" + 'alive.csv', 'a', newline='') as f_csv:
+        with open(path + 'alive.csv', 'a', newline='') as f_csv:
             writer = csv.writer(f_csv)
             if simulation_round == 1:
                 writer.writerow(['round', 'alive'])
@@ -164,9 +171,12 @@ def simulation():
         if wait_for_key:
             input("Press any key to continue...")
 
-    save_to_json(pos_data)
+        logging.info('Round number: ' + str(simulation_round) + ' Wolf position: ' + str(wolf.x) + ', ' + str(wolf.y)
+                     + 'Chased sheep number: ' + str(wolf.victim.id_sheep) + 'Chased sheep position'
+                     + str(wolf.victim.x) + ', ' + str(wolf.victim.y) + 'Number of sheep alive: '
+                     + str(len(sheep)) + 'Number of dead sheep: ' + str(num_of_sheep - len(sheep)))
+
+    save_to_json(pos_data, path)
 
 
 simulation()
-
-

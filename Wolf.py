@@ -2,8 +2,6 @@ import logging
 import math
 
 
-# KOD DO POPRAWY BTW :3
-
 class Wolf:
     def __init__(self, x, y, wolf_move_dist, sheep):
         self.victim = None
@@ -45,13 +43,15 @@ class Wolf:
             self.x = self.victim.x
             self.y = self.victim.y
             self.victim.is_dead = True
-            # self.sheep.remove(self.victim)
             self.is_chasing = False
 
-        # TODO
         else:
-            move_to_x = self.wolf_move_dist * (self.victim.x - self.x) / self.check_distance(self.victim.x, self.victim.y)
-            move_to_y = self.wolf_move_dist * (self.victim.y - self.y) / self.check_distance(self.victim.x, self.victim.y)
+            move_to_x = self.wolf_move_dist \
+                        * (self.victim.x - self.x) / self.check_distance(self.victim.x, self.victim.y)
+            move_to_y = self.wolf_move_dist \
+                        * (self.victim.y - self.y) / self.check_distance(self.victim.x, self.victim.y)
+            logging.info('Wolf headed ' + str(move_to_x) + ' ' + str(move_to_y) + ' from position'
+                         + str(self.x) + ' ' + str(self.y))
             self.x += move_to_x
             self.y += move_to_y
 
