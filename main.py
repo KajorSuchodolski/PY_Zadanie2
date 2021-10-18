@@ -3,6 +3,7 @@ import json
 import csv
 import argparse
 import configparser
+import logging
 import os
 from Sheep import Sheep
 from Wolf import Wolf
@@ -34,6 +35,8 @@ parser.add_argument('-s', '--sheep', type=int,
                     help='define the number of sheep')
 parser.add_argument('-w', '--wait', action='store_true',
                     help='wait for key press after every round')
+parser.add_argument('-l', '--log', type=int,
+                    help='save the events of the chosen type to the log')
 
 args = parser.parse_args()
 print(args.config)
@@ -73,6 +76,13 @@ if args.sheep:
 if args.wait:
     wait_for_key = True
 
+if args.log:
+    if args.log not in (10, 20, 30, 40, 50):
+        raise Exception('Wrong argument')
+
+    logging.basicConfig(filename=path + 'chase.log', level=args.log,
+                        format='%(asctime)s:%(name)s:%(message)s')
+
 
 def save_to_json(data):
     with open(directory + "\\" + 'pos.json', 'w') as f_json:
@@ -94,20 +104,25 @@ def simulation():
 
     sheep = [Sheep(random_position(), random_position(), i + 1) for i in range(num_of_sheep)]
     wolf = Wolf(0.0, 0.0, wolf_move_dist, sheep)
+    logging.debug("Function Wolf(", 0.0, 0.0, wolf_move_dist, sheep, ") was called, returning a Wolf object:", wolf)
 
     pos_data = []
 
     for simulation_round in range(1, rounds + 1):
         for s in sheep:
-            s.move_sheep(random_direction(), sheep_move_dist)
+            rand_direction = random_direction()
+            s.move_sheep(rand_direction, sheep_move_dist)
+            logging.debug("Function s.move_sheep(", rand_direction, sheep_move_dist, ") was called")
 
         wolf.move_wolf()
+        logging.debug("Function wolf.move_wolf() was called")
 
         alive = []
 
         for i in sheep:
             if i.is_dead is False:
                 alive.append(i)
+                logging.debug("Function alive.append(", i, ") was called")
 
         print('\nRound number: ', simulation_round)
         print('Wolf position: ', wolf.x, ', ', wolf.y)
@@ -124,8 +139,10 @@ def simulation():
         for j in range(0, len(sheep)):
             if sheep[j].is_dead is not True:
                 sheep_pos.append([sheep[j].x, sheep[j].y])
+                logging.debug("Function sheep_pos.append(", [sheep[j].x, sheep[j].y], ") was called")
             else:
                 sheep_pos.append('null')
+                logging.debug("Function sheep_pos.append('null') was called")
 
         pos_data.append({
             'round_no': simulation_round,
@@ -142,6 +159,7 @@ def simulation():
             if simulation_round == 1:
                 writer.writerow(['round', 'alive'])
             writer.writerow(row_alive)
+            logging.debug("Function writer.writerow(", row_alive, ") was called")
 
         if wait_for_key:
             input("Press any key to continue...")

@@ -1,3 +1,4 @@
+import logging
 import math
 
 
@@ -28,12 +29,19 @@ class Wolf:
             self.victim = next((s for s in self.sheep if s.id_sheep == self.sheep_number), None)
 
             self.chase()
+            logging.debug("Function chase(", self, ") was called")
 
         else:
             self.chase()
 
     def chase(self):
-        if self.wolf_move_dist > self.check_distance(self.victim.x, self.victim.y):
+        distance_wolf = self.check_distance(self.victim.x, self.victim.y)
+        logging.debug("Function check_distance(", self.victim.x, self.victim.y, ") was called, returning the value of",
+                      distance_wolf)
+        if self.wolf_move_dist > distance_wolf:
+            logging.info('Wolf has caught sheep number ' + str(self.victim.id_sheep) + ' at position'
+                         + str(self.victim.x) + ' ' + str(self.victim.y) + ' from position '
+                         + str(self.x) + ' ' + str(self.y))
             self.x = self.victim.x
             self.y = self.victim.y
             self.victim.is_dead = True
