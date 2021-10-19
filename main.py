@@ -40,11 +40,14 @@ parser.add_argument('-l', '--log', type=int,
                     help='save the events of the chosen type to the log')
 
 args = parser.parse_args()
+logging.debug("Function parse_args() was called")
 print(args.config)
+
 
 if args.config:
     config_file = configparser.ConfigParser()
     config_file.read(args.config)
+    logging.debug("Function read(" + str(args.config) + ") was called on object" + str(config_file))
 
     if float(config_file.get('Movement', 'WolfMoveDist')) <= 0:
         raise Exception('Wolf cannot be moving at velocity 0 or less')
@@ -80,13 +83,12 @@ if args.wait:
 if args.log:
     if args.log not in (10, 20, 30, 40, 50):
         raise Exception('Wrong argument')
+    logging.basicConfig(filename='chase.log', level=args.log,
+                        format='%(asctime)s:%(name)s:%(message)s', force=True, filemode='w')
 
-    logging.basicConfig(filename=path + 'chase.log', level=args.log,
-                        format='%(asctime)s:%(name)s:%(message)s')
 
-
-def save_to_json(data, path):
-    with open(path + 'pos.json', 'w') as f_json:
+def save_to_json(data, path_json):
+    with open(path_json + 'pos.json', 'w') as f_json:
         json.dump(data, f_json, indent=2)
 
 
@@ -108,30 +110,33 @@ def simulation():
     rand_x = random_position()
     rand_y = random_position()
 
-    sheep = [Sheep(rand_x, rand_y, i + 1) for i in range(num_of_sheep)]
-    logging.debug("Function Sheep(", rand_x, rand_y, "i + 1 was called in a loop: for i in range(", num_of_sheep,
-                  " returning a Sheep object with every loop transition and adding it to a list: ", sheep)
+    sheep = []
+    for i in range(num_of_sheep):
+        sheep.append(Sheep(rand_x, rand_y, i + 1))
+        logging.debug("Constructor Sheep(" + str(rand_x) + ", " + str(rand_y) + ", " + str(i + 1) + ") was called")
 
     wolf = Wolf(0.0, 0.0, wolf_move_dist, sheep)
-    logging.debug("Function Wolf(", 0.0, 0.0, wolf_move_dist, sheep, ") was called, returning a Wolf object:", wolf)
+    logging.debug("Constructor Wolf( 0.0, 0.0, " + str(wolf_move_dist) + ", " + str(sheep) + " was called")
 
     pos_data = []
 
     for simulation_round in range(1, rounds + 1):
+
         for s in sheep:
             rand_direction = random_direction()
             s.move_sheep(rand_direction, sheep_move_dist)
-            logging.debug("Function s.move_sheep(", rand_direction, sheep_move_dist, ") was called")
+            logging.debug("Function move_sheep(" + str(rand_direction) + ", "
+                          + str(sheep_move_dist) + ") was called on a Sheep class object: " + str(s))
 
         wolf.move_wolf()
-        logging.debug("Function wolf.move_wolf() was called")
+        logging.debug("Function move_wolf() was called on a Wolf class object: " + str(wolf))
 
         alive = []
 
         for i in sheep:
             if i.is_dead is False:
                 alive.append(i)
-                logging.debug("Function alive.append(", i, ") was called")
+                logging.debug("Function alive.append(" + str(i) + ") was called")
 
         print('\nRound number: ', simulation_round)
         print('Wolf position: ', format(wolf.x, '.3f'), ', ', format(wolf.y, '.3f'))
@@ -146,10 +151,11 @@ def simulation():
         for j in range(0, len(sheep)):
             if sheep[j].is_dead is not True:
                 sheep_pos.append([sheep[j].x, sheep[j].y])
-                logging.debug("Function sheep_pos.append(", [sheep[j].x, sheep[j].y], ") was called")
+                logging.debug("Function append(" + str(sheep[j].x) + ", " + str(sheep[j].y)
+                              + ") was called on a sheep_pos list: " + str(sheep_pos))
             else:
                 sheep_pos.append('null')
-                logging.debug("Function sheep_pos.append('null') was called")
+                logging.debug("Function append('null') was called on a sheep_pos list: " + str(sheep_pos))
 
         pos_data.append({
             'round_no': simulation_round,
@@ -165,6 +171,8 @@ def simulation():
             writer = csv.writer(f_csv)
             if simulation_round == 1:
                 writer.writerow(['round', 'alive'])
+                logging.debug("Function writerow(" + str(['round', 'alive'])
+                              + ") was called on a writer class object: " + str(writer))
             writer.writerow(row_alive)
             logging.debug("Function writer.writerow(", row_alive, ") was called")
 

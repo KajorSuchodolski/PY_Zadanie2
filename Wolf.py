@@ -27,7 +27,7 @@ class Wolf:
             self.victim = next((s for s in self.sheep if s.id_sheep == self.sheep_number), None)
 
             self.chase()
-            logging.debug("Function chase(", self, ") was called")
+            logging.debug("Function chase(" + str(self) + ") was called")
 
         else:
             self.chase()
