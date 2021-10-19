@@ -34,8 +34,9 @@ class Wolf:
 
     def chase(self):
         distance_wolf = self.check_distance(self.victim.x, self.victim.y)
-        logging.debug("Function check_distance(", self.victim.x, self.victim.y, ") was called, returning the value of",
-                      distance_wolf)
+        logging.debug("Function check_distance(" + str(self.victim.x) + " " + str(self.victim.y)
+                      + ") was called on a Wolf object: " + str(self)
+                      + ", returning the value of " + str(distance_wolf))
         if self.wolf_move_dist > distance_wolf:
             logging.info('Wolf has caught sheep number ' + str(self.victim.id_sheep) + ' at position'
                          + str(self.victim.x) + ' ' + str(self.victim.y) + ' from position '

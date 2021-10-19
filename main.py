@@ -22,7 +22,7 @@ wolf_move_dist = 1.0
 num_of_sheep = 15
 wait_for_key = False
 directory = None
-path = ""
+absolute_dir = ""
 
 parser = argparse.ArgumentParser()
 
@@ -64,6 +64,7 @@ if args.dir:
     if not os.path.isdir(args.dir):
         os.mkdir(args.dir)
     directory = args.dir
+    absolute_dir = directory + "\\"
 
 if args.rounds:
     if args.rounds <= 0:
@@ -83,7 +84,7 @@ if args.wait:
 if args.log:
     if args.log not in (10, 20, 30, 40, 50):
         raise Exception('Wrong argument')
-    logging.basicConfig(filename='chase.log', level=args.log,
+    logging.basicConfig(filename=absolute_dir + 'chase.log', level=args.log,
                         format='%(asctime)s:%(name)s:%(message)s', force=True, filemode='w')
 
 
@@ -101,11 +102,6 @@ def random_position():
 
 
 def simulation():
-    global path
-    if directory is not None:
-        path = directory + "\\"
-        if not os.path.isdir(directory):
-            os.mkdir(directory)
 
     rand_x = random_position()
     rand_y = random_position()
@@ -167,14 +163,17 @@ def simulation():
         #     json.dump(pos_data, f_json, indent=2)
 
         row_alive = [simulation_round, len(alive)]
-        with open(path + 'alive.csv', 'a', newline='') as f_csv:
+        with open(absolute_dir + 'alive.csv', 'a', newline='') as f_csv:
             writer = csv.writer(f_csv)
+            logging.debug("Function writer(" + str(f_csv) + ") was called on a csv class object: " + str(csv))
+
             if simulation_round == 1:
                 writer.writerow(['round', 'alive'])
                 logging.debug("Function writerow(" + str(['round', 'alive'])
                               + ") was called on a writer class object: " + str(writer))
             writer.writerow(row_alive)
-            logging.debug("Function writer.writerow(", row_alive, ") was called")
+            logging.debug("Function writerow(" + str(row_alive)
+                          + ") was called on a writer class object: " + str(writer))
 
         if wait_for_key:
             input("Press any key to continue...")
@@ -184,7 +183,14 @@ def simulation():
                      + str(wolf.victim.x) + ', ' + str(wolf.victim.y) + 'Number of sheep alive: '
                      + str(len(sheep)) + 'Number of dead sheep: ' + str(num_of_sheep - len(sheep)))
 
-    save_to_json(pos_data, path)
+    save_to_json(pos_data, absolute_dir)
+    logging.debug("Function save_to_json(" + str(pos_data) + ", " + str(absolute_dir) + ") was called")
 
 
 simulation()
+logging.debug("Function simulation() was called")
+
+
+
+
+
