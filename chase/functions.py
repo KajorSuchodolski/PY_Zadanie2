@@ -1,91 +1,9 @@
-import random
-import json
 import csv
-import argparse
-import configparser
+import json
+import random
 import logging
-import os
 from chase.Sheep import Sheep
 from chase.Wolf import Wolf
-
-# Liczba tur: 50;
-# Liczba owiec: 15;
-# init_pos_limit: 10.0;
-# sheep_move_dist: 0.5;
-# wolf_move_dist: 1.0.
-
-
-rounds = 50
-init_pos_limit = 10.0
-sheep_move_dist = 0.5
-wolf_move_dist = 1.0
-num_of_sheep = 15
-wait_for_key = False
-directory = None
-absolute_dir = ""
-
-parser = argparse.ArgumentParser()
-
-parser.add_argument('-c', '--config', type=str,
-                    help='add configuration file')
-parser.add_argument('-d', '--dir', type=str,
-                    help='directory to which pos.json, alive.csv and optionally chase.log files shall be saved')
-parser.add_argument('-r', '--rounds', type=int,
-                    help='define the number of rounds')
-parser.add_argument('-s', '--sheep', type=int,
-                    help='define the number of sheep')
-parser.add_argument('-w', '--wait', action='store_true',
-                    help='wait for key press after every round')
-parser.add_argument('-l', '--log', type=int,
-                    help='save the events of the chosen type to the log')
-
-args = parser.parse_args()
-logging.debug("Function parse_args() was called")
-print(args.config)
-
-
-if args.config:
-    config_file = configparser.ConfigParser()
-    config_file.read(args.config)
-    logging.debug("Function read(" + str(args.config) + ") was called on object" + str(config_file))
-
-    if float(config_file.get('Movement', 'WolfMoveDist')) <= 0:
-        raise Exception('Wolf cannot be moving at velocity 0 or less')
-    if float(config_file.get('Movement', 'SheepMoveDist')) <= 0:
-        raise Exception('Sheep cannot be moving at velocity 0 or less')
-    if float(config_file.get('Terrain', 'InitPosLimit')) == 0:
-        raise Exception('Sheep cannot be placed at 0.0')
-
-    init_pos_limit = float(config_file.get('Terrain', 'InitPosLimit'))
-    wolf_move_dist = float(config_file.get('Movement', 'WolfMoveDist'))
-    sheep_move_dist = float(config_file.get('Movement', 'SheepMoveDist'))
-
-if args.dir:
-    if not os.path.isdir(args.dir):
-        os.mkdir(args.dir)
-    directory = args.dir
-    absolute_dir = directory + "\\"
-
-if args.rounds:
-    if args.rounds <= 0:
-        raise Exception('The number of rounds should be more than 0')
-
-    rounds = args.rounds
-
-if args.sheep:
-    if args.sheep <= 0:
-        raise Exception('The number of sheep should be more than 0')
-
-    num_of_sheep = args.sheep
-
-if args.wait:
-    wait_for_key = True
-
-if args.log:
-    if args.log not in (10, 20, 30, 40, 50):
-        raise Exception('Wrong argument')
-    logging.basicConfig(filename=absolute_dir + 'chase.log', level=args.log,
-                        format='%(levelname)s:%(asctime)s:%(name)s:%(message)s', force=True, filemode='w')
 
 
 def save_to_json(data, path_json):
@@ -97,14 +15,14 @@ def random_direction():
     return random.randint(0, 3)
 
 
-def random_position():
+def random_position(init_pos_limit):
     return random.uniform(-init_pos_limit, init_pos_limit)
 
 
-def simulation():
+def simulation(rounds, init_pos_limit, sheep_move_dist, wolf_move_dist, num_of_sheep, wait_for_key, absolute_dir):
 
-    rand_x = random_position()
-    rand_y = random_position()
+    rand_x = random_position(init_pos_limit)
+    rand_y = random_position(init_pos_limit)
 
     sheep = []
     for i in range(num_of_sheep):
@@ -159,9 +77,6 @@ def simulation():
             'sheep_pos': sheep_pos
         })
 
-        # with open('pos.json', 'a') as f_json:
-        #     json.dump(pos_data, f_json, indent=2)
-
         row_alive = [simulation_round, len(alive)]
         with open(absolute_dir + 'alive.csv', 'a', newline='') as f_csv:
             writer = csv.writer(f_csv)
@@ -185,12 +100,3 @@ def simulation():
 
     save_to_json(pos_data, absolute_dir)
     logging.debug("Function save_to_json(" + str(pos_data) + ", " + str(absolute_dir) + ") was called")
-
-
-simulation()
-logging.debug("Function simulation() was called")
-
-
-
-
-
