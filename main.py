@@ -118,21 +118,31 @@ def simulation():
 
     for simulation_round in range(1, rounds + 1):
 
+        alive = []
+
         for s in sheep:
-            rand_direction = random_direction()
-            s.move_sheep(rand_direction, sheep_move_dist)
-            logging.debug("Function move_sheep(" + str(rand_direction) + ", "
+            if s.is_dead is False:
+                alive.append(s)
+                rand_direction = random_direction()
+                s.move_sheep(rand_direction, sheep_move_dist)
+                logging.debug("Function move_sheep(" + str(rand_direction) + ", "
                           + str(sheep_move_dist) + ") was called on a Sheep class object: " + str(s))
+                logging.debug("Function alive.append(" + str(s) + ") was called.")
+
+        logging.info("Alive: " + str(alive))
+
+        if not alive:
+            print("Wolf has eaten all the sheep!")
+            return
 
         wolf.move_wolf()
         logging.debug("Function move_wolf() was called on a Wolf class object: " + str(wolf))
 
-        alive = []
 
-        for i in sheep:
-            if i.is_dead is False:
-                alive.append(i)
-                logging.debug("Function alive.append(" + str(i) + ") was called")
+        # for i in sheep:
+        #     if i.is_dead is False:
+        #         alive.append(i)
+        #         logging.debug("Function alive.append(" + str(i) + ") was called")
 
         print('\nRound number: ', simulation_round)
         print('Wolf position: ', format(wolf.x, '.3f'), ', ', format(wolf.y, '.3f'))
@@ -181,7 +191,7 @@ def simulation():
         logging.info('Round number: ' + str(simulation_round) + ' Wolf position: ' + str(wolf.x) + ', ' + str(wolf.y)
                      + 'Chased sheep number: ' + str(wolf.victim.id_sheep) + 'Chased sheep position'
                      + str(wolf.victim.x) + ', ' + str(wolf.victim.y) + 'Number of sheep alive: '
-                     + str(len(sheep)) + 'Number of dead sheep: ' + str(num_of_sheep - len(sheep)))
+                     + str(len(alive)) + 'Number of dead sheep: ' + str(alive - len(sheep)))
 
     save_to_json(pos_data, absolute_dir)
     logging.debug("Function save_to_json(" + str(pos_data) + ", " + str(absolute_dir) + ") was called")

@@ -18,9 +18,9 @@ class Wolf:
             self.is_chasing = True
             sheep_distances = []
 
-            for pp in self.sheep:
-                if pp.is_dead is False:
-                    sheep_distances.append(self.check_distance(pp.x, pp.y))
+            for shp in self.sheep:
+                if shp.is_dead is False:
+                    sheep_distances.append(self.check_distance(shp.x, shp.y))
 
             sheep_number = self.sheep[sheep_distances.index(min(sheep_distances))].id_sheep
             self.sheep_number = sheep_number
@@ -37,6 +37,7 @@ class Wolf:
         logging.debug("Function check_distance(" + str(self.victim.x) + " " + str(self.victim.y)
                       + ") was called on a Wolf object: " + str(self)
                       + ", returning the value of " + str(distance_wolf))
+
         if self.wolf_move_dist > distance_wolf:
             logging.info('Wolf has caught sheep number ' + str(self.victim.id_sheep) + ' at position'
                          + str(self.victim.x) + ' ' + str(self.victim.y) + ' from position '
