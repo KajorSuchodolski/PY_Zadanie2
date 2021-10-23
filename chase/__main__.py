@@ -46,7 +46,7 @@ def simulation(rounds, init_pos_limit, sheep_move_dist, wolf_move_dist, num_of_s
         logging.debug("Constructor Sheep(" + str(rand_x) + ", " + str(rand_y) + ", " + str(i + 1)
                       + ") was called, creating a Sheep object: " + str(sheep_obj))
 
-    wolf = Wolf(0.0, 0.0, wolf_move_dist, sheep)
+    wolf = Wolf(0.0, 0.0, wolf_move_dist)
     logging.debug("Constructor Wolf( 0.0, 0.0, " + str(wolf_move_dist) + ", " + str(sheep)
                   + " was called, creating a Wolf object: " + str(wolf))
 
@@ -72,7 +72,7 @@ def simulation(rounds, init_pos_limit, sheep_move_dist, wolf_move_dist, num_of_s
             print("Wolf has eaten all the sheep!")
             return
 
-        wolf.move_wolf()
+        wolf.move_wolf(sheep)
         logging.debug("Function move_wolf() was called on a Wolf class object: " + str(wolf))
 
         # alive = []
