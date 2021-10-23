@@ -47,15 +47,12 @@ class Wolf:
             self.victim.is_dead = True
             self.is_chasing = False
 
-            if not self.sheep:
-                print('Wolf has consumed all of the sheep')
-
         else:
             move_to_x = self.wolf_move_dist \
-                        * (self.victim.x - self.x) / self.check_distance(self.victim.x, self.victim.y)
+                * (self.victim.x - self.x) / self.check_distance(self.victim.x, self.victim.y)
             move_to_y = self.wolf_move_dist \
-                        * (self.victim.y - self.y) / self.check_distance(self.victim.x, self.victim.y)
-            logging.info('Wolf headed ' + str(move_to_x) + ' ' + str(move_to_y) + ' from position'
+                * (self.victim.y - self.y) / self.check_distance(self.victim.x, self.victim.y)
+            logging.info('Wolf headed ' + str(move_to_x + self.x) + ' ' + str(move_to_y + self.y) + ' from position '
                          + str(self.x) + ' ' + str(self.y))
             self.x += move_to_x
             self.y += move_to_y
